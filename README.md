@@ -1,4 +1,4 @@
-![](https://img.shields.io/twitter/follow/programmfabrik.svg?label=Follow&style=social)  [![](http://img.shields.io/badge/docs-GoDoc-red.svg)](https://godoc.org/github.com/programmfabrik/go-test-utils)
+![](https://img.shields.io/twitter/follow/programmfabrik.svg?label=Follow&style=social)  [![GoDoc](https://godoc.org/github.com/programmfabrik/go-test-utils?status.svg)](https://godoc.org/github.com/programmfabrik/go-test-utils)
              
                                                                                                          
 # Go Test Utils
