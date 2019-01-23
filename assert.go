@@ -1,6 +1,7 @@
 package test_utils
 
 import (
+	"encoding/json"
 	"net/http"
 	"strings"
 	"testing"
@@ -25,6 +26,37 @@ func ClearSlash(in string) string {
 func CheckFor500(t *testing.T, statusCode int) {
 	if status := statusCode; status != http.StatusInternalServerError {
 		t.Fatalf("wrong status code: got '%d' want '%d'", status, http.StatusInternalServerError)
+	}
+}
+
+// jsonEqual tries to compare s1 and s2 as json, return true
+// if the content is the same, false otherwise
+func JsonEqual(s1, s2 string) bool {
+	if s1 == s2 {
+		return true
+	}
+	var i1, i2 interface{}
+	err := json.Unmarshal([]byte(s1), &i1)
+	if err != nil {
+		return false
+	}
+	err = json.Unmarshal([]byte(s2), &i2)
+	if err != nil {
+		return false
+	}
+	b1, err := json.Marshal(i1)
+	if err != nil {
+		return false
+	}
+	b2, err := json.Marshal(i2)
+	if err != nil {
+		return false
+	}
+	// fmt.Printf("%s\n\n%s\n\n", string(b1), string(b2))
+	if string(b1) == string(b2) {
+		return true
+	} else {
+		return false
 	}
 }
 
