@@ -1,6 +1,7 @@
 package test_utils
 
 import (
+	"net/http"
 	"strings"
 	"testing"
 )
@@ -14,6 +15,16 @@ func AssertStringEquals(t *testing.T, have, want string) {
 func AssertIntEquals(t *testing.T, have, want int) {
 	if have != want {
 		t.Errorf("Have '%d' != '%d' Want", have, want)
+	}
+}
+
+func ClearSlash(in string) string {
+	return strings.Replace(strings.Replace(in, "//", "/", -1), `\\`, `\`, -1)
+}
+
+func CheckFor500(t *testing.T, statusCode int) {
+	if status := statusCode; status != http.StatusInternalServerError {
+		t.Fatalf("wrong status code: got '%d' want '%d'", status, http.StatusInternalServerError)
 	}
 }
 
