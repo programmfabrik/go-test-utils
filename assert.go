@@ -1,142 +1,133 @@
 package test_utils
 
 import (
-	"encoding/json"
-	"net/http"
 	"strings"
 	"testing"
 )
 
-func AssertStringEquals(t *testing.T, have, want string) {
-	if have != want {
-		t.Errorf("Have '%s' != '%s' Want", have, want)
+// 	AssertStringEquals checks if two strings are equal
+// 	Input:
+//		t *testing.T 		The testing object, so we can call the return functions on it
+//   	expected string 	Te string you want to have
+//   	got string			The string you actually got from your test result
+func AssertStringEquals(t testing.TB, expected, got string) {
+	if expected != got {
+		t.Errorf("expected '%s' != '%s' Want", expected, got)
 	}
 }
 
-func AssertIntEquals(t *testing.T, have, want int) {
-	if have != want {
-		t.Errorf("Have '%d' != '%d' Want", have, want)
+// 	AssertIntEquals checks if two strings are equal
+// 	Input:
+//		t *testing.T 		The testing object, so we can call the return functions on it
+//   	expected int 		The int you want to have
+//   	got int				The int you actually got from your test result
+func AssertIntEquals(t testing.TB, expected, got int) {
+	if expected != got {
+		t.Errorf("expected '%d' != '%d' Want", expected, got)
 	}
 }
 
-func ClearSlash(in string) string {
-	return strings.Replace(strings.Replace(in, "//", "/", -1), `\\`, `\`, -1)
-}
-
-func CheckFor500(t *testing.T, statusCode int) {
-	if status := statusCode; status != http.StatusInternalServerError {
-		t.Fatalf("wrong status code: got '%d' want '%d'", status, http.StatusInternalServerError)
+//	AssertIsError checks if there is an error
+//	Input:
+//		t *testing.T 		The testing object, so we can call the return functions on it
+//		err error	 		The error you want to check for
+func AssertIsError(t testing.TB, err error) {
+	if err == nil {
+		t.Errorf("err == nil")
 	}
 }
 
-// jsonEqual tries to compare s1 and s2 as json, return true
-// if the content is the same, false otherwise
-func JsonEqual(s1, s2 string) bool {
-	if s1 == s2 {
-		return true
-	}
-	var i1, i2 interface{}
-	err := json.Unmarshal([]byte(s1), &i1)
-	if err != nil {
-		return false
-	}
-	err = json.Unmarshal([]byte(s2), &i2)
-	if err != nil {
-		return false
-	}
-	b1, err := json.Marshal(i1)
-	if err != nil {
-		return false
-	}
-	b2, err := json.Marshal(i2)
-	if err != nil {
-		return false
-	}
-	// fmt.Printf("%s\n\n%s\n\n", string(b1), string(b2))
-	if string(b1) == string(b2) {
-		return true
-	} else {
-		return false
-	}
-}
-
-func AssertErrorEquals(t *testing.T, have, want error) {
-	if want == nil && have != nil {
-		t.Errorf("Have '%v' != '%v' Want", have, want)
-		return
-	}
-	if want != nil && have == nil {
-		t.Errorf("Have '%v' != '%v' Want", have, want)
+//	AssertErrorEquals checks if the actually error is equal the expected one, by doing a string compare
+//	Input:
+//		t *testing.T 		The testing object, so we can call the return functions on it
+//		expected error	 	The error you expect
+//		got error	 		The error you actually got
+func AssertErrorEquals(t *testing.T, expected, got error) {
+	if got == nil && expected == nil {
 		return
 	}
 
-	if want == nil && have == nil {
+	if got == nil && expected != nil {
+		t.Errorf("expected '%v' != '%v' Want", expected, got)
+		return
+	}
+	if got != nil && expected == nil {
+		t.Errorf("expected '%v' != '%v' Want", expected, got)
 		return
 	}
 
-	if have.Error() != want.Error() {
-		t.Errorf("Have '%v' != '%v' Want", have, want)
+	if expected.Error() != got.Error() {
+		t.Errorf("expected '%v' != '%v' Want", expected, got)
 		return
 	}
 }
 
-func AsserErrorEqualsAny(t *testing.T, have error, want []error) {
-	if want == nil && have != nil {
-		t.Errorf("Have '%v' != '%v' Want", have, want)
-		return
-	}
-	if want != nil && have == nil {
-		t.Errorf("Have '%v' != '%v' Want", have, want)
+//	AsserErrorEqualsAny checks if the actually error is equal to one in your error slice.
+//	You can use this function if you expect an error, but you do not exactly know which one
+//	Input:
+//		t *testing.T 		The testing object, so we can call the return functions on it
+//		got error	 		The error you actually got
+//		expectAnyIn []error	All the errors that are a valid result
+func AsserErrorEqualsAny(t *testing.T, got error, expectAnyIn []error) {
+	if expectAnyIn == nil && got == nil {
 		return
 	}
 
-	if want == nil && have == nil {
+	if expectAnyIn == nil && got != nil {
+		t.Errorf("got != nil &&  expectAnyIn == nil")
 		return
 	}
-	for _, v := range want {
-		if have.Error() == v.Error() {
+
+	if expectAnyIn != nil && got == nil {
+		t.Errorf("got == nil &&  expectAnyIn != nil")
+		return
+	}
+
+	for _, v := range expectAnyIn {
+		if got.Error() == v.Error() {
 			return
 		}
 	}
 
-	t.Errorf("'%v' not in '%v'", have, want)
+	t.Errorf("'%v' not in '%v'", got, expectAnyIn)
 }
 
-func AssertErrorContains(t *testing.T, have, want error) {
-	if want == nil && have != nil {
-		t.Errorf("'%v' != '%v'", have, want)
-		return
-	}
-	if want != nil && have == nil {
-		t.Errorf("'%v' != '%v'", have, want)
-		return
-	}
-
-	if want == nil && have == nil {
+//	AssertErrorContains checks if the given error contains the expected substring
+//	Input:
+//		t *testing.T 			The testing object, so we can call the return functions on it
+//		err error	 			The error you actually got
+//		shouldContain string 	The substring you expect in the error
+func AssertErrorContains(t *testing.T, err error, shouldContain string) {
+	if shouldContain == "" && err == nil {
 		return
 	}
 
-	if !strings.Contains(have.Error(), want.Error()) {
-		t.Errorf("'%v' was not found in '%v'", want, have)
+	if err == nil && shouldContain != "" {
+		t.Errorf("err == nil && shouldContaint != nil")
+		return
+	}
+
+	if err != nil && shouldContain == "" {
+		t.Errorf("err != nil && shouldContaint == nil")
+		return
+	}
+
+	if !strings.Contains(err.Error(), shouldContain) {
+		t.Errorf("'%v' was not found in '%v'", shouldContain, err)
 		return
 	}
 }
 
-func CheckError(t *testing.T, err error, errorMessage string) {
-	if err != nil {
-		t.Error(errorMessage)
-	}
-}
-
-func ExpectError(t *testing.T, err error, errorMessage string) {
-	if err == nil {
-		t.Error(errorMessage)
-	}
-}
-
+//	AssertStringContainsSubstringsInOrder checks if the given string contains all the expected strings in the right order.
+//	Prints the complete body if wrong order is present
+//	Input:
+//		t *testing.T 			The testing object, so we can call the return functions on it
+//		body string	 			The string you got
+//		expectedStrings string 	The substrings you expect to be in order in the body string
 func AssertStringContainsSubstringsInOrder(t *testing.T, body string, expectedStrings []string) {
 	cI := 0
 	print := false
+
 	for _, v := range expectedStrings {
 		i := strings.Index(body, v)
 		if i < cI {
@@ -152,6 +143,12 @@ func AssertStringContainsSubstringsInOrder(t *testing.T, body string, expectedSt
 	}
 }
 
+//	AssertStringContainsSubstringsNoOrder checks if the given string contains all the expected strings, we do not care about the order
+//	Prints the complete body if wrong order is present
+//	Input:
+//		t *testing.T 			The testing object, so we can call the return functions on it
+//		body string	 			The string you got
+//		expectedStrings string 	The substrings you expect to be in the body string
 func AssertStringContainsSubstringsNoOrder(t *testing.T, body string, expectedStrings []string) {
 	for _, v := range expectedStrings {
 		if !strings.Contains(body, v) {
@@ -160,14 +157,21 @@ func AssertStringContainsSubstringsNoOrder(t *testing.T, body string, expectedSt
 	}
 }
 
-func AssertStringContainsNoneOfTheSubstrings(t *testing.T, body string, notExpectedLogEntries []string) {
+//	AssertStringContainsNoneOfTheSubstrings checks if the given string contains any of the nonExpectedStrings
+//	If a string is found, the test fails and we print the complete body
+//	Prints the complete body if wrong order is present
+//	Input:
+//		t *testing.T 				The testing object, so we can call the return functions on it
+//		body string	 				The string you got
+//		nonExpectedStrings string 	The substrings you expect not to be in the body string
+func AssertStringContainsNoneOfTheSubstrings(t *testing.T, body string, nonExpectedStrings []string) {
 	print := false
-	for _, v := range notExpectedLogEntries {
+
+	for _, v := range nonExpectedStrings {
 		if strings.Contains(body, v) {
 			t.Errorf("We did not expect '%s' but found it in '%s'", v, body)
 			print = true
 		}
-
 	}
 
 	if print {
@@ -175,53 +179,78 @@ func AssertStringContainsNoneOfTheSubstrings(t *testing.T, body string, notExpec
 	}
 }
 
-// AssertMapsEqual checks if two maps have the exact same content
-// Attention: This function changes the value of the first map!
-func AssertMapsEqual(t *testing.T, got, want map[string]interface{}) {
+//	AssertMapsEqual checks if two maps have the exact same content
+//	If a string is found, the test fails and we print the complete body
+//	Prints the complete body if wrong order is present
+//	Input:
+//		t *testing.T 					The testing object, so we can call the return functions on it
+//		got map[string]interface{}	 	The map you got
+//		expected map[string]interface{}	The map you expect to have
+func AssertMapsEqual(t *testing.T, got, expected map[string]interface{}) {
+	// Create new maps
+	gotCopy := make(map[string]interface{})
+	expectedCopy := make(map[string]interface{})
 
-	for k, v := range want {
-		if got[k] != v {
-			t.Errorf("[%s] Got '%v' != '%v' Want", k, got[k], v)
+	// Copy the values over
+	for key, value := range expected {
+		expectedCopy[key] = value
+	}
+	for key, value := range got {
+		gotCopy[key] = value
+	}
+
+	// Iterate over the expected map and check if the values are present and equal in the got map
+	for k, v := range expectedCopy {
+		if gotCopy[k] != v {
+			t.Errorf("[%s] got '%v' != '%v' expected", k, got[k], v)
 		} else {
-			delete(got, k)
+			delete(gotCopy, k)
 		}
 	}
 
-	for k, v := range got {
-		t.Errorf("[%s] Got '%v' != '' Want", k, v)
-
+	// Print if there are extra values in the got map
+	for k, v := range gotCopy {
+		t.Errorf("[%s] got '%v' != '' expected", k, v)
 	}
 }
-func AssertStringArraysEqualNoOrder(t *testing.T, have, want []string) {
-	wantInner := make([]string, len(want))
-	copy(wantInner, want)
 
-	if want == nil && have != nil {
-		t.Errorf("Have '%v' != '%v' Want", have, want)
-		return
-	}
-	if want != nil && have == nil {
-		t.Errorf("Have '%v' != '%v' Want", have, want)
-		return
-	}
-
-	if want == nil && have == nil {
+//	AssertStringArraysEqualNoOrder checks if two string slices are the same, but do not have the same order
+//	Input:
+//		t *testing.T 		The testing object, so we can call the return functions on it
+//		got []string	 	The slice you got
+//		expected []string	The map you expect to have
+func AssertStringArraysEqualNoOrder(t *testing.T, got, expected []string) {
+	if expected == nil && got == nil {
 		return
 	}
 
-	for _, v := range have {
-		for ik, iv := range wantInner {
+	if expected == nil && got != nil {
+		t.Errorf("got '%v' != '%v' expected", got, expected)
+		return
+	}
+
+	if expected != nil && got == nil {
+		t.Errorf("got '%v' != '%v' expected", got, expected)
+		return
+	}
+
+	// Copy the expected array over (as me modify it later on)
+	expectedInner := make([]string, len(expected))
+	copy(expectedInner, expected)
+
+	for _, v := range got {
+		for ik, iv := range expectedInner {
 			if v == iv {
-				wantInner = append(wantInner[:ik], wantInner[ik+1:]...)
+				expectedInner = append(expectedInner[:ik], expectedInner[ik+1:]...)
 				break
 			}
 		}
 	}
 
-	if len(wantInner) > 0 {
-		for _, v := range wantInner {
+	// Print if there are elements left, that where not found in the got slice
+	if len(expectedInner) > 0 {
+		for _, v := range expectedInner {
 			t.Errorf("'%s' not found", v)
 		}
 	}
-
 }
