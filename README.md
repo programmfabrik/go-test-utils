@@ -1,4 +1,4 @@
-![](https://img.shields.io/twitter/follow/programmfabrik.svg?label=Follow&style=social)  ![https://godoc.org/github.com/programmfabrik/go-test-utils](http://img.shields.io/badge/docs-GoDoc-red.svg)
+![](https://img.shields.io/twitter/follow/programmfabrik.svg?label=Follow&style=social)  [![](http://img.shields.io/badge/docs-GoDoc-red.svg)](https://godoc.org/github.com/programmfabrik/go-test-utils)
              
                                                                                                          
 # Go Test Utils
@@ -7,7 +7,7 @@ This small packages gives you some handy testing functions, to supercharge your 
 
 **Full documentation?** Use the source, Luke (or go to [GoDoc](https://godoc.org/github.com/programmfabrik/go-test-utils))
 
-*You have your own small functions, that help you with you unit test. Do not hesitate to open a pull request so we can build a great tool chain and make unit go testing even more effective.*
+**Do you have your own small functions, that help you with you unit test? Do not hesitate to open a pull request so we can build a great tool chain and make unit go testing even more effective.**
 
 ## Assert
 
