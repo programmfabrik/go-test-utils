@@ -1,1 +1,1 @@
-module github.com/programmfabrik/go-test-utils
+module github.com/programmfabrik/go_test_utils
