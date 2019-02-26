@@ -1,4 +1,4 @@
-package test_utils
+package go_test_utils
 
 import (
 	"encoding/json"
