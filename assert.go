@@ -1,6 +1,7 @@
 package go_test_utils
 
 import (
+	"github.com/sergi/go-diff/diffmatchpatch"
 	"strings"
 	"testing"
 )
@@ -12,7 +13,9 @@ import (
 //   	got string			The string you actually got from your test result
 func AssertStringEquals(t testing.TB, expected, got string) {
 	if expected != got {
-		t.Errorf("expected '%s' != '%s' Want", expected, got)
+		dmp := diffmatchpatch.New()
+		diffs := dmp.DiffMain(expected, got, false)
+		t.Error(dmp.DiffPrettyText(diffs))
 	}
 }
 
@@ -238,19 +241,35 @@ func AssertStringArraysEqualNoOrder(t *testing.T, got, expected []string) {
 	expectedInner := make([]string, len(expected))
 	copy(expectedInner, expected)
 
+	gotInner := make([]string, 0)
+
 	for _, v := range got {
+		notMatched := true
 		for ik, iv := range expectedInner {
 			if v == iv {
+				notMatched = false
 				expectedInner = append(expectedInner[:ik], expectedInner[ik+1:]...)
 				break
 			}
 		}
+
+		if notMatched {
+			gotInner = append(gotInner, v)
+		}
+
 	}
 
 	// Print if there are elements left, that where not found in the got slice
 	if len(expectedInner) > 0 {
 		for _, v := range expectedInner {
 			t.Errorf("'%s' not found", v)
+		}
+	}
+
+	// Print if there are elements left, that where not found in the want slice
+	if len(gotInner) > 0 {
+		for _, v := range gotInner {
+			t.Errorf("'%s' not expected", v)
 		}
 	}
 }
