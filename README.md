@@ -9,6 +9,13 @@ This small packages gives you some handy testing functions, to supercharge your 
 
 **Do you have your own small functions, that help you with you unit test? Do not hesitate to open a pull request so we can build a great tool chain and make unit go testing even more effective.**
 
+## Error
+
+`ExpectError(t *testing.T,err error, msg string)` Checks if the given error is an error
+
+`ExpectNoError(t *testing.T,err error, msg string)` Checks if the given error is nil
+
+
 ## Assert
 
 `AssertStringEquals(t testing.TB, expected, got string)` checks if two strings are equal
